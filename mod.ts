@@ -1,9 +1,9 @@
 // Copyright 2021-2022 the Deno authors. All rights reserved. MIT license.
+// Copyright 2024 Kitson P. Kelly. All rights reserved. MIT license.
 
-import { ConnInfo } from "https://deno.land/std@0.120.0/http/server.ts";
-import { STATUS_TEXT } from "https://deno.land/std@0.120.0/http/http_status.ts";
-import snakeCase from "https://deno.land/x/case@2.1.1/snakeCase.ts";
-import { getCookies } from "https://deno.land/std@0.143.0/http/cookie.ts";
+import { snakeCase } from "@luca/cases";
+import { STATUS_TEXT } from "@std/http";
+import { getCookies } from "@std/http/cookie";
 
 const GA4_ENDPOINT_URL = "https://www.google-analytics.com/g/collect";
 const SLOW_UPLOAD_THRESHOLD = 1_000;
@@ -69,8 +69,12 @@ export interface Event {
   params: Record<string, Primitive>;
 }
 
-// Defaults to "page_view", but can be overridden/surpressed.
+// Defaults to "page_view", but can be overridden/suppressed.
 export type PrimaryEvent = Event | null;
+
+export interface ConnInfo {
+  remoteAddr: Deno.NetAddr;
+}
 
 export interface GA4Init {
   measurementId?: string;
@@ -322,7 +326,7 @@ function getPageReferrer(request: Request): string | undefined {
 
 // if _ga cookie exists, then not first time visitor.
 function getFirstVisit(
-  request: Request
+  request: Request,
 ): boolean | undefined {
   return getClientId(request) ? false : true;
 }
@@ -334,8 +338,8 @@ function getCampaignObject(request: Request): Campaign {
     source: url.searchParams.get("utm_source") || undefined,
     medium: url.searchParams.get("utm_medium") || undefined,
     content: url.searchParams.get("utm_content") || undefined,
-    term: url.searchParams.get("utm_term") || undefined
-  }
+    term: url.searchParams.get("utm_term") || undefined,
+  };
 }
 
 // function getPageTrafficType(
@@ -353,7 +357,8 @@ function getCampaignObject(request: Request): Campaign {
 
 export function formatStatus(response: Response): string {
   let { status, statusText } = response;
-  statusText ||= STATUS_TEXT.get(status) ?? "Invalid Status";
+  statusText ||= STATUS_TEXT[status as keyof typeof STATUS_TEXT] ??
+    "Invalid Status";
   return `${status} ${statusText}`;
 }
 

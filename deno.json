@@ -1,0 +1,12 @@
+{
+  "name": "@kitsonk/ga4",
+  "version": "0.1.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "@luca/cases": "jsr:@luca/cases@^1.0.0",
+    "@std/http": "jsr:@std/http@^0.224.0"
+  },
+  "lock": false
+}
